@@ -33,7 +33,7 @@ def show_Info():
 
     # Configure the label's appearance (optional)
     label.config(font=("Arial", 24))
-    label.place(x=50, y=2)  # Places the label at coordinates (50, 50)
+    label.place(x=50, y=50)  # Places the label at coordinates (50, 50)
     # Place the label in the window using grid layout
     button2 = tk.Button(button_frame, text="Open Camera", command=run_fileCamera, padx=10, pady=5, bg="#cc3333", fg="white",
                         font=("Arial", 12))
