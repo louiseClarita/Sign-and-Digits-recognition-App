@@ -73,9 +73,9 @@ def main():
     # Release resources
     capture.release()
     cv2.destroyAllWindows()
-
+main()
 if __name__ == '__main__':
     print("please make sure you have a clear background, the data used to train this model is specific to clear backgrounds, we will make sure to find more generic data later on!")
     print("Press Q to exit")
 
-    main()
+    #main()

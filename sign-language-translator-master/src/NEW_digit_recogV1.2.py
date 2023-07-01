@@ -4,6 +4,7 @@ from needed import imresize
 from PIL import Image
 import cv2  # version 3.2.0
 from skimage.feature import hog
+import matplotlib.image as mpimg
 from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
@@ -136,8 +137,10 @@ def proc_user_img(img_file, model):
 
     plt.imshow(im)
     cv2.imwrite("original_overlay.png", im)
+
     cv2.imwrite("final_digits.png", blank_image)
     # cv2.destroyAllWindows()
+
 
 
 def get_contour_precedence(contour, cols):
@@ -207,7 +210,8 @@ model = KNN_MODEL(k=3)
 model.train(X_train, y_train)
 preds = model.predict(X_test)
 print('Accuracy: ', accuracy_score(y_test, preds))
-
+im2 =  Image.open("original_overlay.png")
+plt.imshow(im2)
 model = KNN_MODEL(k=4)
 model.train(train_digits_data, labels)
 proc_user_img(TEST_USER_IMG, model)
@@ -215,6 +219,14 @@ proc_user_img(TEST_USER_IMG, model)
 model = SVM_MODEL(num_feats=train_digits_data.shape[1])
 model.train(X_train, y_train)
 preds = model.predict(X_test)
+
+# Read the image file
+image = mpimg.imread('original_overlay.png')
+
+# Display the image
+plt.imshow(image)
+plt.axis('off')
+plt.show()
 print('Accuracy: ', accuracy_score(y_test, preds))
 
 model = SVM_MODEL(num_feats=train_digits_data.shape[1])
