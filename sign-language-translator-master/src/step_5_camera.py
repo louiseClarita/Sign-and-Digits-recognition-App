@@ -28,31 +28,26 @@ def main():
     ort_session = ort.InferenceSession("signlanguage.onnx")
 
     # Open webcam
-    capture = cv2.VideoCapture(0)
+    capture = cv2.VideoCapture(1)
 
     while True:
         # Capture frame from webcam
         ret, frame = capture.read()
 
-        # Preprocess the frame
-        cropped_frame = center_crop(frame)
-        gray_frame = cv2.cvtColor(cropped_frame, cv2.COLOR_RGB2GRAY)
-        resized_frame = cv2.resize(gray_frame, (28, 28))
-        normalized_frame = (resized_frame - mean) / std
+        # preprocess data
+        frame = center_crop(frame)
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+        x = cv2.resize(frame, (28, 28))
+        x = (x - mean) / std
 
-        # Prepare input for the ONNX model
-        input_data = normalized_frame.reshape(1, 1, 28, 28).astype(np.float32)
+        x = x.reshape(1, 1, 28, 28).astype(np.float32)
+        y = ort_session.run(None, {'input': x})[0]
 
-        # Run inference with the ONNX model
-        output = ort_session.run(None, {'input': input_data})[0]
+        index = np.argmax(y, axis=1)
+        letter = index_to_letter[int(index)]
 
-        # Get predicted letter
-        predicted_index = np.argmax(output, axis=1)
-        predicted_letter = index_to_letter[int(predicted_index)]
-
-        # Display predicted letter on the frame
-        cv2.putText(cropped_frame, predicted_letter, (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 2.0, (255, 255, 0), thickness=1)
-        cv2.imshow("Project: ML - Sign Language Recognizer", cropped_frame)
+        cv2.putText(frame, letter, (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 2.0, (0, 255, 0), thickness=2)
+        cv2.imshow("Sign Language Translator", frame)
 
         # Wait for key press and perform actions
         key = cv2.waitKey(1)
@@ -61,11 +56,11 @@ def main():
         if key == ord('c') or key == ord('s'):
             action = "image captured" if key == ord('c') else "image captured and quitting"
             print(action)
-            cv2.imwrite('captured_image.jpg', cropped_frame)
+            cv2.imwrite('captured_image.jpg', frame)
             image = Image.open('captured_image.jpg')
             draw = ImageDraw.Draw(image)
             font = ImageFont.load_default()  # Replace with the path to your desired font
-            draw.text((10, 10), predicted_letter, fill=(0, 0, 0), font=font)
+            #draw.text((10, 10), str(letter), fill=(0, 0, 0), font=font)
             image.show()
             if key == ord('s'):
                 break
